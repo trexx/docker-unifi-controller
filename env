@@ -1,0 +1,3 @@
+UNIFI_CONTROLLER_VERSION="7.4.162"
+DOCKER_REPO="ghcr.io/trexx/docker-unifi-controller"
+MONGODB_VERSION="3.6.23"
