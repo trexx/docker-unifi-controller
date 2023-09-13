@@ -13,7 +13,7 @@ RUN wget -O /tmp/mongodb-linux.tgz https://fastdl.mongodb.org/linux/mongodb-linu
 RUN tar -zxf /tmp/mongodb-linux.tgz mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod -C /tmp
 RUN mv mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod /tmp/usr/lib/unifi/bin/mongod
 
-FROM amazoncorretto:11
+FROM amazoncorretto:17-al2-native-headless
 LABEL org.opencontainers.image.source https://github.com/trexx/docker-unifi-controller
 
 COPY --from=downloader --link /tmp/usr/lib/unifi /app
@@ -21,4 +21,4 @@ COPY --from=downloader --link /tmp/usr/lib/unifi /app
 WORKDIR /app
 
 EXPOSE 8080/tcp 8443/tcp
-CMD ["/usr/bin/java", "-XX:-UsePerfData", "-jar", "/app/lib/ace.jar", "start"]
+CMD ["/usr/bin/java", "--add-opens=java.base/java.time=ALL-UNNAMED", "-XX:-UsePerfData", "-jar", "/app/lib/ace.jar", "start"]
