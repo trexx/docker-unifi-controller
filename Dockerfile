@@ -1,24 +1,32 @@
-FROM alpine:3.18 AS downloader
+FROM busybox:1-uclibc AS downloader
 
 ARG UNIFI_CONTROLLER_VERSION
 ENV UNIFI_CONTROLLER_VERSION "$UNIFI_CONTROLLER_VERSION"
 ARG MONGODB_VERSION
 ENV MONGODB_VERSION "$MONGODB_VERSION"
 
-RUN apk add --upgrade --no-cache dpkg
-RUN wget -O /tmp/unifi_sysvinit_all.deb https://dl.ui.com/unifi/${UNIFI_CONTROLLER_VERSION}/unifi_sysvinit_all.deb
-RUN dpkg-deb -xv /tmp/unifi_sysvinit_all.deb /tmp
-
-RUN wget -O /tmp/mongodb-linux.tgz https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB_VERSION}.tgz
-RUN tar -zxf /tmp/mongodb-linux.tgz mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod -C /tmp
-RUN mv mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod /tmp/usr/lib/unifi/bin/mongod
+RUN wget -O- https://dl.ui.com/unifi/${UNIFI_CONTROLLER_VERSION}/UniFi.unix.zip | unzip -qd /tmp -
+RUN wget -O- https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB_VERSION}.tgz | tar -zx mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod -C /tmp
+RUN mv /tmp/mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod /tmp/UniFi/bin/mongod
 
 FROM amazoncorretto:17-al2-native-headless
 LABEL org.opencontainers.image.source https://github.com/trexx/docker-unifi-controller
 
-COPY --from=downloader --link /tmp/usr/lib/unifi /app
+COPY --from=downloader --link /tmp/UniFi /app
 
 WORKDIR /app
 
 EXPOSE 8080/tcp 8443/tcp
-CMD ["/usr/bin/java", "--add-opens=java.base/java.time=ALL-UNNAMED", "-XX:-UsePerfData", "-jar", "/app/lib/ace.jar", "start"]
+CMD ["/usr/bin/java", \
+    "-Dfile.encoding=UTF-8", \
+    "--add-opens=java.base/java.lang=ALL-UNNAMED", \
+    "--add-opens=java.base/java.time=ALL-UNNAMED", \
+    "--add-opens=java.base/sun.security.util=ALL-UNNAMED", \
+    "--add-opens=java.base/java.io=ALL-UNNAMED", \
+    "--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED", \
+    "-XX:+UseParallelGC", \
+    "-XX:-UsePerfData", \
+    "-XX:+ExitOnOutOfMemoryError", \
+    "-jar", \
+    "/app/lib/ace.jar", \
+    "start"]
