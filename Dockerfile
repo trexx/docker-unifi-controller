@@ -9,7 +9,7 @@ RUN wget -O- https://dl.ui.com/unifi/${UNIFI_CONTROLLER_VERSION}/UniFi.unix.zip 
 RUN wget -O- https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB_VERSION}.tgz | tar -zx mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod -C /tmp
 RUN mv /tmp/mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod /tmp/UniFi/bin/mongod
 
-FROM amazoncorretto:17-al2-native-headless
+FROM gcr.io/distroless/java17-debian12:latest
 LABEL org.opencontainers.image.source https://github.com/trexx/docker-unifi-controller
 
 COPY --from=downloader --link /tmp/UniFi /app
@@ -17,8 +17,7 @@ COPY --from=downloader --link /tmp/UniFi /app
 WORKDIR /app
 
 EXPOSE 8080/tcp 8443/tcp
-CMD ["/usr/bin/java", \
-    "-Dfile.encoding=UTF-8", \
+CMD ["-Dfile.encoding=UTF-8", \
     "--add-opens=java.base/java.lang=ALL-UNNAMED", \
     "--add-opens=java.base/java.time=ALL-UNNAMED", \
     "--add-opens=java.base/sun.security.util=ALL-UNNAMED", \
