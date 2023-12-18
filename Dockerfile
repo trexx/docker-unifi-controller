@@ -1,9 +1,7 @@
 FROM busybox:1-uclibc AS downloader
 
-ARG UNIFI_CONTROLLER_VERSION
-ENV UNIFI_CONTROLLER_VERSION "$UNIFI_CONTROLLER_VERSION"
-ARG MONGODB_VERSION
-ENV MONGODB_VERSION "$MONGODB_VERSION"
+ENV UNIFI_CONTROLLER_VERSION "7.5.187-f57f5bf7ab"
+ENV MONGODB_VERSION "3.6.23"
 
 RUN wget -O- https://dl.ui.com/unifi/${UNIFI_CONTROLLER_VERSION}/UniFi.unix.zip | unzip -qd /tmp -
 RUN wget -O- https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB_VERSION}.tgz | tar -zx mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod -C /tmp
