@@ -6,6 +6,14 @@
     "default:automergeDigest",
     "helpers:pinGitHubActionDigests"
   ],
+  "packageRules": [
+    {
+      "enabled": false,
+      "matchDepTypes":[
+        "stage"
+      ]
+    }
+  ],
   "enabledManagers": [
     "dockerfile",
     "github-actions"
