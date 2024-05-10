@@ -7,7 +7,7 @@ RUN wget -O- https://dl.ui.com/unifi/${UNIFI_CONTROLLER_VERSION}/UniFi.unix.zip 
 RUN wget -O- https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB_VERSION}.tgz | tar -zx mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod -C /tmp
 RUN mv /tmp/mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod /tmp/UniFi/bin/mongod
 
-FROM gcr.io/distroless/java17-debian12:latest@sha256:dc1a871139a2009725ecb6e8e9ee63778676aff0840a8c0a658ab38b0ef8f670
+FROM gcr.io/distroless/java17-debian12:latest@sha256:1b2d30d74581a959f19704771ee5799160d3b8b7d076a94ca6c91c4065391eef
 LABEL org.opencontainers.image.source https://github.com/trexx/docker-unifi-controller
 
 COPY --from=downloader --link /tmp/UniFi /app
