@@ -59,5 +59,4 @@ jobs:
           package-name: ${{ github.event.repository.name }}
           package-type: container
           min-versions-to-keep: 4
-          delete-only-untagged-versions: False
           ignore-versions: "^latest$"
