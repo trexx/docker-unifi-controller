@@ -58,5 +58,5 @@ jobs:
         with:
           package-name: ${{ github.event.repository.name }}
           package-type: container
-          min-versions-to-keep: 4
+          min-versions-to-keep: 6
           ignore-versions: "^latest$"
