@@ -4,8 +4,7 @@
     "docker:enableMajor",
     "docker:pinDigests",
     "default:automergeDigest",
-    "default:automergeMinor",
-    "helpers:pinGitHubActionDigests"
+    "default:automergeMinor"
   ],
   "packageRules": [
     {
