@@ -15,7 +15,6 @@
     }
   ],
   "enabledManagers": [
-    "dockerfile",
-    "github-actions"
+    "dockerfile"
   ]
 }
