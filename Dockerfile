@@ -11,6 +11,9 @@ LABEL org.opencontainers.image.source="https://github.com/trexx/docker-unifi-con
 
 COPY --from=downloader --link /tmp/UniFi /
 
+RUN ln -s /data /app/data
+RUN ln -s /logs /app/logs
+
 WORKDIR /app
 
 EXPOSE 8080/tcp 8443/tcp
