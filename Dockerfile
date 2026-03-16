@@ -1,4 +1,4 @@
-FROM busybox:1-uclibc AS downloader
+FROM busybox:1-uclibc@sha256:23deb35184aeb204224e6307f9c82a26f87059a5c9f476c797ba28f357e5df6d AS downloader
 
 ENV UNIFI_CONTROLLER_VERSION="10.2.93-4hp3b041r2"
 ENV MONGODB_VERSION="3.6.23"
