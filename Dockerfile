@@ -6,7 +6,7 @@ ENV MONGODB_VERSION="3.6.23"
 RUN wget -O- https://dl.ui.com/unifi/${UNIFI_CONTROLLER_VERSION}/UniFi.unix.zip | unzip -qd /tmp -
 RUN wget -O- https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB_VERSION}.tgz | tar -zx mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod -C /tmp/UniFi/bin mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod --strip-components=2
 
-FROM gcr.io/distroless/java25-debian13@sha256:e451771b5ce325ae33ec6cb229ffca0552a9ebf5bcd1e36f859ad4bf55956e3c AS compile
+FROM gcr.io/distroless/java25-debian13@sha256:70036fed3c5ba28821c5fad98b613a2fb173cc52fa893b509abedaa2e82ba9c1 AS compile
 LABEL org.opencontainers.image.source="https://github.com/trexx/docker-unifi-controller"
 
 COPY --from=downloader --link /tmp/UniFi /app
