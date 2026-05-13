@@ -1,6 +1,6 @@
 FROM busybox:1-uclibc@sha256:23deb35184aeb204224e6307f9c82a26f87059a5c9f476c797ba28f357e5df6d AS downloader
 
-ENV UNIFI_CONTROLLER_VERSION="10.3.58-2kp7io9bd2"
+ENV UNIFI_CONTROLLER_VERSION="10.4.55-k3jka320yj"
 ENV MONGODB_VERSION="3.6.23"
 
 RUN wget -O- https://dl.ui.com/unifi/${UNIFI_CONTROLLER_VERSION}/UniFi.unix.zip | unzip -qd /tmp -
