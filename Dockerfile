@@ -13,7 +13,6 @@ COPY --from=downloader --link /tmp/UniFi /app
 
 WORKDIR /app
 
-EXPOSE 8080/tcp 8443/tcp
 CMD ["-Dfile.encoding=UTF-8", \
     "--add-opens=java.base/java.lang=ALL-UNNAMED", \
     "--add-opens=java.base/java.time=ALL-UNNAMED", \
