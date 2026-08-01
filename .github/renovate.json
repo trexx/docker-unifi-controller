@@ -5,7 +5,8 @@
     "docker:enableMajor",
     "docker:pinDigests",
     "default:automergeDigest",
-    "default:automergeMinor"
+    "default:automergeMinor",
+    "helpers:pinGitHubActionDigests"
   ],
   "packageRules": [
     {
@@ -13,9 +14,25 @@
       "matchDepTypes":[
         "stage"
       ]
+    },
+    {
+      "enabled": false,
+      "matchManagers": [
+        "github-actions"
+      ]
+    },
+    {
+      "enabled": true,
+      "matchFileNames": [
+        ".github/workflows/unifi-version.yml"
+      ],
+      "matchManagers": [
+        "github-actions"
+      ]
     }
   ],
   "enabledManagers": [
-    "dockerfile"
+    "dockerfile",
+    "github-actions"
   ]
 }
