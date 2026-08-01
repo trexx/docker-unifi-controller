@@ -1,0 +1,91 @@
+name: 'UniFi version'
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' # v7
+
+      - name: 'Resolve latest release'
+        id: 'resolve'
+        shell: 'python'
+        run: |
+          import os
+          import re
+          import sys
+          import urllib.request
+          import xml.etree.ElementTree as ET
+
+          FEED = 'https://community.ui.com/rss/releases/UniFi-Network-Application/e6712595-81bb-4829-8e42-9e2630fabcfe'
+          TITLE = re.compile(r'UniFi Network Application (\d+\.\d+\.\d+)')
+
+          def key(version):
+              return tuple(int(part) for part in version.split('.'))
+
+          with open('Dockerfile') as dockerfile:
+              pin = re.search(r'ENV UNIFI_CONTROLLER_VERSION="(\d+\.\d+\.\d+)"', dockerfile.read())
+
+          if not pin:
+              sys.exit('No plain semver UNIFI_CONTROLLER_VERSION pin found in the Dockerfile')
+
+          request = urllib.request.Request(FEED, headers={'User-Agent': 'docker-unifi-controller'})
+          with urllib.request.urlopen(request, timeout=30) as response:
+              feed = ET.fromstring(response.read())
+
+          # Titles are matched in full, so anything qualified - "... (Early Access)" and
+          # the feed's own channel title - is left out.
+          releases = {}
+          for item in feed.findall('./channel/item'):
+              title = TITLE.fullmatch((item.findtext('title') or '').strip())
+              if title:
+                  releases.setdefault(title.group(1), (item.findtext('link') or '').strip())
+
+          if not releases:
+              sys.exit('No releases found in the feed')
+
+          current = pin.group(1)
+          latest = max(releases, key=key)
+          print(f'Pinned {current}, latest {latest}')
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f'version={latest}\n')
+              output.write(f'notes={releases[latest]}\n')
+              output.write(f'outdated={str(key(latest) > key(current)).lower()}\n')
+
+      - name: 'Open pull request'
+        if: "steps.resolve.outputs.outdated == 'true'"
+        env:
+          GH_TOKEN: '${{ github.token }}'
+          NOTES: '${{ steps.resolve.outputs.notes }}'
+          VERSION: '${{ steps.resolve.outputs.version }}'
+        run: |
+          set -euo pipefail
+
+          curl -fsSI "https://dl.ui.com/unifi/${VERSION}/UniFi.unix.zip" > /dev/null
+
+          if git ls-remote --exit-code origin "refs/heads/unifi/${VERSION}" > /dev/null 2>&1; then
+            echo "Branch unifi/${VERSION} already exists, nothing to do"
+            exit 0
+          fi
+
+          sed -i -E "s|^ENV UNIFI_CONTROLLER_VERSION=.*|ENV UNIFI_CONTROLLER_VERSION=\"${VERSION}\"|" Dockerfile
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "unifi/${VERSION}"
+          git commit -am 'Update UniFi Controller version in Dockerfile'
+          git push origin "unifi/${VERSION}"
+
+          gh pr create \
+            --base "${GITHUB_REF_NAME}" \
+            --head "unifi/${VERSION}" \
+            --title "Update UniFi Network Application to ${VERSION}" \
+            --body "Release notes: ${NOTES}"
